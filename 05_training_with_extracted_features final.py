@@ -13,7 +13,7 @@ model = Sequential()
 model.add(Flatten(input_shape=x_train.shape[1:]))
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(3, activation='softmax'))
+model.add(Dense(5, activation='softmax'))
 
 # Compile the model  HUSK AT
 model.compile(
@@ -26,7 +26,7 @@ model.compile(
 model.fit(
     x_train,
     y_train,
-    epochs=10,
+    epochs=80,
     shuffle=True
 )
 
