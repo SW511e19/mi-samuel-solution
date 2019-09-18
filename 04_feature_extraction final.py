@@ -5,88 +5,45 @@ import joblib
 from keras.preprocessing import image
 from keras.applications import vgg16
 
-# Path to folders with training data
-not_cards = Path("training_data") / "not_cards"
-green_cards = Path("training_data") / "green_cards"
-red_cards = Path("training_data") / "red_cards"
-blue_cards = Path("training_data") / "blue_cards"
-black_cards = Path("training_data") / "black_cards"
+def add_images_with_labels(image_path, label_number):
+    for img in image_path.glob("*.png"):
+        img = image.load_img(img)
+        image_array = image.img_to_array(img)
 
-# Normalize data set to 0-to-1 range
-#x_train = x_train.astype('float32')
-#x_train /= 255
+        images.append(image_array)
+        labels.append(formatted_card_labels[label_number])
+    return
+
+# Path to folders with training data
+not_cards = Path("training_data") / "Not_card"
+angel = Path("training_data") / "Angel"
+demon = Path("training_data") / "Demon"
+goblin = Path("training_data") / "Goblin"
+human = Path("training_data") / "Human"
+merfolk = Path("training_data") / "Merfolk"
+spirit = Path("training_data") / "Spirit"
+zombie = Path("training_data") / "Zombie"
 
 images = []
 card_labels = [
-    0,
-    1,
-    2,
-    3,
-    4
+    0, 1, 2, 3, 4, 5, 6, 7
 ]
 
-formatted_card_labels = keras.utils.to_categorical(card_labels, 5)
+formatted_card_labels = keras.utils.to_categorical(card_labels, 8)
 print(formatted_card_labels)
 
 
 labels = []
 # Load all the not-card images
-for img in not_cards.glob("*.png"):
-    # Load the image from disk
-    img = image.load_img(img)
 
-    # Convert the image to a numpy array
-    image_array = image.img_to_array(img)
-
-    # Add the image to the list of images
-    images.append(image_array)
-
-    # For each 'not card' image, the expected value should be 0
-    labels.append(formatted_card_labels[0])
-
-# Load all the card images
-for img in green_cards.glob("*.png"):
-    # Load the image from disk
-    img = image.load_img(img)
-
-    # Convert the image to a numpy array
-    image_array = image.img_to_array(img)
-
-    # Add the image to the list of images
-    images.append(image_array)
-
-    # For each 'card' image, the expected value should be 1
-    labels.append(formatted_card_labels[1])
-
-
-# Load all the card images
-for img in red_cards.glob("*.png"):
-    # Load the image from disk
-    img = image.load_img(img)
-
-    # Convert the image to a numpy array
-    image_array = image.img_to_array(img)
-
-    # Add the image to the list of images
-    images.append(image_array)
-
-    # For each 'card' image, the expected value should be 1
-    labels.append(formatted_card_labels[2])
-
-
-for img in blue_cards.glob("*.png"):
-    img = image.load_img(img)
-    image_array = image.img_to_array(img)
-
-    images.append(image_array)
-    labels.append(formatted_card_labels[3])
-
-for img in black_cards.glob("*.png"):
-    img = image.load_img(img)
-    image_array = image.img_to_array(img)
-
-    images.append(image_array)
-    labels.append(formatted_card_labels[4])
+add_images_with_labels(not_cards, 0)
+add_images_with_labels(angel, 1)
+add_images_with_labels(demon, 2)
+add_images_with_labels(goblin, 3)
+add_images_with_labels(human, 4)
+add_images_with_labels(merfolk, 5)
+add_images_with_labels(spirit, 6)
+add_images_with_labels(zombie, 7)
 
 # Create a single numpy array with all the images we loaded
 x_train = np.array(images)
@@ -98,7 +55,7 @@ y_train = np.array(labels)
 x_train = vgg16.preprocess_input(x_train)
 
 # Load a pre-trained neural network to use as a feature extractor
-pretrained_nn = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+pretrained_nn = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(223, 310, 3))
 
 # Extract features for each image (all in one pass)
 features_x = pretrained_nn.predict(x_train)
@@ -108,3 +65,5 @@ joblib.dump(features_x, "x_train.dat")
 
 # Save the matching array of expected values to a file
 joblib.dump(y_train, "y_train.dat")
+
+
